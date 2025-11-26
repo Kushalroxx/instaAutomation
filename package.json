@@ -1,0 +1,15 @@
+﻿{
+  "name": "ig-automation",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "bootstrap": "pnpm -w install"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  }
+}
