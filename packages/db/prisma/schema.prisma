@@ -1,0 +1,293 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  
+  // Subscription & Usage
+  subscriptionTier  String   @default("free") // "free", "pro", "business"
+  usageLimit        Int      @default(100)    // Messages per day
+  usageCount        Int      @default(0)      // Current usage count
+  usageResetAt      DateTime @default(now())  // When to reset usage count
+  
+  // Stripe
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  accounts          Account[]
+  sessions          Session[]
+  instagramAccounts InstagramAccount[]
+  automations       AutomationRule[]
+  
+  @@index([email])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// INSTAGRAM INTEGRATION
+// ============================================
+
+model InstagramAccount {
+  id                  String   @id @default(cuid())
+  userId              String
+  
+  // Meta/Instagram IDs
+  pageId              String   @unique
+  igBusinessAccountId String   @unique
+  username            String?
+  profilePictureUrl   String?
+  
+  // Access Token (encrypted in production)
+  accessToken         String @db.Text
+  tokenExpiresAt      DateTime
+  tokenRefreshedAt    DateTime @default(now())
+  
+  // Webhook
+  webhookSubscribed   Boolean  @default(false)
+  
+  // Status
+  isActive            Boolean  @default(true)
+  lastSyncAt          DateTime @default(now())
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  automations   AutomationRule[]
+  conversations Conversation[]
+  webhookEvents WebhookEvent[]
+  
+  @@index([userId])
+  @@index([pageId])
+  @@index([igBusinessAccountId])
+}
+
+// ============================================
+// AUTOMATION RULES
+// ============================================
+
+model AutomationRule {
+  id          String  @id @default(cuid())
+  userId      String
+  igAccountId String
+  
+  // Basic Info
+  name        String
+  description String?
+  isActive    Boolean @default(true)
+  
+  // Trigger Configuration
+  triggerType String // "keyword", "first_message", "reaction", "story_reply", "comment"
+  conditions  Json   // { "keyword": "hello", "matchType": "contains" }
+  
+  // Action Configuration
+  actionType   String // "ai_reply", "predefined_message", "save_lead", "tag_user", "webhook"
+  actionConfig Json   // { "message": "...", "tone": "friendly", "businessContext": "..." }
+  
+  // Statistics
+  triggerCount Int @default(0)
+  successCount Int @default(0)
+  failureCount Int @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  igAccount    InstagramAccount @relation(fields: [igAccountId], references: [id], onDelete: Cascade)
+  activityLogs ActivityLog[]
+  
+  @@index([userId])
+  @@index([igAccountId])
+  @@index([isActive])
+}
+
+// ============================================
+// CONVERSATIONS & MESSAGES
+// ============================================
+
+model Conversation {
+  id             String   @id @default(cuid())
+  igAccountId    String
+  
+  // Sender Info
+  senderId       String   // Instagram user ID
+  senderUsername String?
+  senderName     String?
+  
+  // Conversation Data
+  messages       Json[]   // Array of { role, content, timestamp, messageId }
+  
+  // Metadata
+  tags           String[] @default([])
+  leadScore      Int?     // 0-100
+  funnelStage    String?  // "new", "engaged", "qualified", "converted"
+  
+  // Timestamps
+  firstMessageAt DateTime @default(now())
+  lastMessageAt  DateTime @default(now())
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  igAccount    InstagramAccount @relation(fields: [igAccountId], references: [id], onDelete: Cascade)
+  activityLogs ActivityLog[]
+  
+  @@unique([igAccountId, senderId])
+  @@index([igAccountId])
+  @@index([senderId])
+  @@index([lastMessageAt])
+}
+
+// ============================================
+// ACTIVITY LOGS
+// ============================================
+
+model ActivityLog {
+  id             String   @id @default(cuid())
+  automationId   String?
+  conversationId String?
+  
+  // Message Data
+  incomingMessage  String @db.Text
+  outgoingResponse String? @db.Text
+  
+  // Processing Info
+  status           String   // "success", "failed", "pending", "skipped"
+  errorMessage     String? @db.Text
+  processingTimeMs Int?     // How long it took to process
+  
+  // AI Info (if applicable)
+  aiModel          String?  // "gpt-4", "gpt-3.5-turbo", etc.
+  aiTokensUsed     Int?
+  aiCost           Float?   // Cost in USD
+  
+  createdAt DateTime @default(now())
+  
+  // Relations
+  automation   AutomationRule? @relation(fields: [automationId], references: [id], onDelete: SetNull)
+  conversation Conversation?   @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  
+  @@index([automationId])
+  @@index([conversationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================
+// WEBHOOK EVENTS (Raw Storage)
+// ============================================
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  igAccountId String?
+  
+  // Event Data
+  eventType   String   // "messages", "comments", "mentions", "story_replies"
+  payload     Json     // Raw webhook payload
+  
+  // Processing
+  processed   Boolean  @default(false)
+  processedAt DateTime?
+  
+  createdAt DateTime @default(now())
+  
+  // Relations
+  igAccount InstagramAccount? @relation(fields: [igAccountId], references: [id], onDelete: SetNull)
+  
+  @@index([igAccountId])
+  @@index([processed])
+  @@index([createdAt])
+}
+
+// ============================================
+// TEMPLATES (For quick automation setup)
+// ============================================
+
+model AutomationTemplate {
+  id          String @id @default(cuid())
+  
+  // Template Info
+  name        String
+  description String @db.Text
+  category    String // "real_estate", "fitness", "ecommerce", "general"
+  icon        String?
+  
+  // Template Configuration
+  triggerType  String
+  conditions   Json
+  actionType   String
+  actionConfig Json
+  
+  // Metadata
+  usageCount   Int     @default(0)
+  isPublic     Boolean @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([category])
+  @@index([isPublic])
+}
