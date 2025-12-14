@@ -137,36 +137,93 @@ export default function DashboardPage() {
 
 // Overview Content Component
 function OverviewContent() {
-    const stats = [
+    const [stats, setStats] = useState([
         {
             label: 'Messages Processed',
-            value: '1,234',
-            change: '+12%',
+            value: '0',
+            change: '+0%',
             icon: MessageSquare,
             color: 'from-blue-500 to-cyan-500'
         },
         {
             label: 'Active Automations',
-            value: '8',
-            change: '+2',
+            value: '0',
+            change: '+0',
             icon: Zap,
             color: 'from-purple-500 to-pink-500'
         },
         {
             label: 'Response Rate',
-            value: '98.5%',
-            change: '+5%',
+            value: '0%',
+            change: '+0%',
             icon: TrendingUp,
             color: 'from-green-500 to-emerald-500'
         },
         {
             label: 'Active Users',
-            value: '456',
-            change: '+23',
+            value: '0',
+            change: '+0',
             icon: Users,
             color: 'from-orange-500 to-red-500'
         },
-    ]
+    ])
+    const [recentActivity, setRecentActivity] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                // Fetch stats
+                const statsRes = await fetch('/api/stats')
+                const statsData = await statsRes.json()
+
+                if (statsData.stats) {
+                    setStats([
+                        {
+                            label: 'Messages Processed',
+                            value: statsData.stats.messagesProcessed.toString(),
+                            change: '+0%',
+                            icon: MessageSquare,
+                            color: 'from-blue-500 to-cyan-500'
+                        },
+                        {
+                            label: 'Active Automations',
+                            value: statsData.stats.activeAutomations.toString(),
+                            change: '+0',
+                            icon: Zap,
+                            color: 'from-purple-500 to-pink-500'
+                        },
+                        {
+                            label: 'Response Rate',
+                            value: statsData.stats.responseRate,
+                            change: '+0%',
+                            icon: TrendingUp,
+                            color: 'from-green-500 to-emerald-500'
+                        },
+                        {
+                            label: 'Active Users',
+                            value: statsData.stats.activeUsers.toString(),
+                            change: '+0',
+                            icon: Users,
+                            color: 'from-orange-500 to-red-500'
+                        },
+                    ])
+                }
+
+                // Fetch activity
+                const activityRes = await fetch('/api/activity')
+                const activityData = await activityRes.json()
+                if (activityData.activity) {
+                    setRecentActivity(activityData.activity)
+                }
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
 
     return (
         <div className="space-y-6">
@@ -258,12 +315,25 @@ function OverviewContent() {
 
 // Automations Content Component
 function AutomationsContent() {
-    const automations = [
-        { id: 1, name: 'Welcome New Followers', trigger: 'First Message', status: 'active', triggers: 234 },
-        { id: 2, name: 'Product Inquiry Response', trigger: 'Keyword: "price"', status: 'active', triggers: 156 },
-        { id: 3, name: 'Lead Qualification', trigger: 'Keyword: "interested"', status: 'active', triggers: 89 },
-        { id: 4, name: 'Support Ticket Creation', trigger: 'Keyword: "help"', status: 'paused', triggers: 45 },
-    ]
+    const [automations, setAutomations] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        async function fetchAutomations() {
+            try {
+                const res = await fetch('/api/automations')
+                const data = await res.json()
+                if (data.automations) {
+                    setAutomations(data.automations)
+                }
+            } catch (error) {
+                console.error('Error fetching automations:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchAutomations()
+    }, [])
 
     return (
         <div className="space-y-6">
@@ -314,12 +384,25 @@ function AutomationsContent() {
 
 // Conversations Content Component
 function ConversationsContent() {
-    const conversations = [
-        { id: 1, user: 'Sarah Johnson', username: '@sarah_designs', lastMessage: 'Thanks for the quick response!', time: '2m ago', unread: 0 },
-        { id: 2, user: 'Mike Chen', username: '@mike_photos', lastMessage: 'What are your pricing options?', time: '15m ago', unread: 2 },
-        { id: 3, user: 'Emma Wilson', username: '@emma_art', lastMessage: 'I\'m interested in your services', time: '1h ago', unread: 1 },
-        { id: 4, user: 'John Davis', username: '@john_dev', lastMessage: 'Can you help me with...', time: '3h ago', unread: 0 },
-    ]
+    const [conversations, setConversations] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        async function fetchConversations() {
+            try {
+                const res = await fetch('/api/conversations')
+                const data = await res.json()
+                if (data.conversations) {
+                    setConversations(data.conversations)
+                }
+            } catch (error) {
+                console.error('Error fetching conversations:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchConversations()
+    }, [])
 
     return (
         <div className="space-y-6">
