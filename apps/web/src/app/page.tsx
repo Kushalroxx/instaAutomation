@@ -19,6 +19,7 @@ import {
     X
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { UserMenu } from '@/components/user-menu'
 
 export default function DashboardPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -90,15 +91,7 @@ export default function DashboardPage() {
 
                         {/* User Profile */}
                         <div className="absolute bottom-6 left-6 right-6">
-                            <div className="glass-card p-4 flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                                    <span className="text-sm font-bold">JD</span>
-                                </div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-semibold">John Doe</p>
-                                    <p className="text-xs text-gray-400">Pro Plan</p>
-                                </div>
-                            </div>
+                            <UserMenu />
                         </div>
                     </motion.aside>
                 )}
@@ -424,7 +417,7 @@ function ConversationsContent() {
                     >
                         <div className="flex items-start gap-4">
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center flex-shrink-0">
-                                <span className="text-sm font-bold">{conv.user.split(' ').map(n => n[0]).join('')}</span>
+                                <span className="text-sm font-bold">{conv.user.split(' ').filter((n: string) => n.length > 0).map((n: string) => n[0]!).join('')}</span>
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between mb-1">

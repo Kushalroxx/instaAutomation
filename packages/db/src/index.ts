@@ -16,6 +16,8 @@ export * from '@prisma/client'
 
 // Export Redis and Queue utilities
 export * from './redis'
+export { redis, webhookQueue, messageQueue, sendMessageQueue, queueWebhookEvent, queueMessageProcessing, queueSendMessage } from './redis'
+
 
 // ============================================
 // HELPER FUNCTIONS
