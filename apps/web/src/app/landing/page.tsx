@@ -1,310 +1,242 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { useState } from 'react'
-import {
-    Instagram, ArrowRight, Sparkles, Zap, Brain, MessageSquare,
-    TrendingUp, Shield, Clock, CheckCircle, Star, Users, BarChart3,
-    Award, Globe, Lock
-} from 'lucide-react'
+import { signIn } from 'next-auth/react';
+import { Instagram, Sparkles, Zap, BarChart3, Bot, MessageSquare, Clock, Shield, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function LandingPage() {
-    const [activePricing, setActivePricing] = useState<'monthly' | 'yearly'>('monthly')
-
     return (
         <div className="min-h-screen gradient-bg">
-            {/* Navigation */}
-            <nav className="glass-card border-b border-white/10 sticky top-0 z-50 backdrop-blur-xl">
-                <div className="max-w-7xl mx-auto px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl instagram-gradient flex items-center justify-center">
-                                <Instagram size={24} className="text-white" />
-                            </div>
-                            <span className="text-xl font-black">InstaAuto</span>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <Link href="/auth/signin" className="px-6 py-2.5 text-gray-300 hover:text-white transition-colors font-medium">
-                                Sign In
-                            </Link>
-                            <Link href="/auth/signin" className="btn-primary px-8 py-2.5 flex items-center gap-2">
-                                Start Free
-                                <ArrowRight size={18} />
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
             {/* Hero Section */}
-            <section className="relative overflow-hidden py-20 lg:py-32">
-                {/* Background elements */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl animate-pulse"></div>
-                    <div className="absolute bottom-20 right-1/4 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-                </div>
-
-                <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="text-center max-w-4xl mx-auto space-y-8">
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2 px-6 py-3 glass-card rounded-full border border-primary-500/30">
-                            <Sparkles size={20} className="text-primary-400 animate-pulse" />
-                            <span className="bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent font-semibold">
-                                Trusted by 10,000+ businesses worldwide
-                            </span>
-                            <Sparkles size={20} className="text-purple-400 animate-pulse" />
+            <section className="relative overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-center"
+                    >
+                        {/* Logo */}
+                        <div className="w-24 h-24 rounded-2xl instagram-gradient flex items-center justify-center mx-auto mb-8">
+                            <Instagram className="text-white" size={48} />
                         </div>
 
-                        {/* Main headline */}
-                        <h1 className="text-6xl lg:text-8xl font-black leading-[1.1] tracking-tight">
-                            Your Instagram
+                        {/* Title */}
+                        <h1 className="text-5xl md:text-7xl font-bold mb-6">
+                            Instagram Automation
                             <br />
-                            <span className="instagram-gradient bg-clip-text text-transparent">
-                                AI Assistant
-                            </span>
-                            <br />
-                            <span className="text-5xl lg:text-6xl text-gray-300">
-                                Never Sleeps
-                            </span>
+                            <span className="gradient-text">Powered by AI</span>
                         </h1>
 
-                        <p className="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-3xl mx-auto">
-                            Automate Instagram DMs with AI. Respond instantly to every message,
-                            qualify leads, and convert customers — all while you focus on growing your business.
+                        <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                            Automate your Instagram DMs with intelligent AI replies. Save time, engage better, and grow your business 24/7.
                         </p>
 
                         {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-                            <Link
-                                href="/auth/signin"
-                                className="btn-primary px-10 py-5 text-lg font-bold flex items-center gap-3 shadow-2xl shadow-primary-500/50 hover:shadow-primary-500/70"
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                            <button
+                                onClick={() => signIn('google', { callbackUrl: '/' })}
+                                className="btn-primary px-8 py-4 text-lg flex items-center justify-center gap-3"
                             >
-                                Start Free Trial
-                                <ArrowRight size={24} />
-                            </Link>
-                            <button className="px-10 py-5 glass-card hover:bg-white/10 rounded-2xl font-bold text-lg transition-all">
-                                Watch Demo
+                                <Sparkles size={24} />
+                                Get Started Free
+                            </button>
+                            <button
+                                onClick={() => signIn('google', { callbackUrl: '/' })}
+                                className="glass-card px-8 py-4 text-lg hover:bg-white/10 transition-colors rounded-xl flex items-center justify-center gap-3"
+                            >
+                                <svg className="w-6 h-6" viewBox="0 0 24 24">
+                                    <path
+                                        fill="currentColor"
+                                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                    />
+                                    <path
+                                        fill="currentColor"
+                                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                    />
+                                    <path
+                                        fill="currentColor"
+                                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                    />
+                                    <path
+                                        fill="currentColor"
+                                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                    />
+                                </svg>
+                                Sign in with Google
                             </button>
                         </div>
 
-                        {/* Trust indicators */}
-                        <div className="flex items-center justify-center gap-8 pt-8 text-sm text-gray-400">
+                        {/* Trust Indicators */}
+                        <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-400">
                             <div className="flex items-center gap-2">
-                                <CheckCircle size={18} className="text-green-400" />
-                                <span>No credit card</span>
+                                <Shield size={16} className="text-green-500" />
+                                <span>Secure & Private</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <CheckCircle size={18} className="text-green-400" />
-                                <span>100 free msgs/day</span>
+                                <Sparkles size={16} className="text-primary-500" />
+                                <span>AI-Powered</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <CheckCircle size={18} className="text-green-400" />
-                                <span>Cancel anytime</span>
+                                <Clock size={16} className="text-blue-500" />
+                                <span>24/7 Automation</span>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Social proof stats */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-20 max-w-5xl mx-auto">
-                        {[
-                            { number: '10K+', label: 'Active Users' },
-                            { number: '5M+', label: 'Messages Sent' },
-                            { number: '98%', label: 'Response Rate' },
-                            { number: '4.9/5', label: 'User Rating' },
-                        ].map((stat, i) => (
-                            <div key={i} className="glass-card p-6 text-center hover:scale-105 transition-transform">
-                                <div className="text-4xl font-black instagram-gradient bg-clip-text text-transparent mb-2">
-                                    {stat.number}
-                                </div>
-                                <div className="text-sm text-gray-400">{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
             {/* Features Section */}
-            <section className="py-20 lg:py-32 relative">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-5xl font-black mb-6">
-                            Why Choose <span className="instagram-gradient bg-clip-text text-transparent">InstaAuto</span>?
-                        </h2>
-                        <p className="text-xl text-gray-400">
-                            Everything you need to automate Instagram DMs and convert more leads
-                        </p>
-                    </div>
+            <section className="py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-center mb-16"
+                    >
+                        <h2 className="text-4xl font-bold mb-4">Everything You Need</h2>
+                        <p className="text-xl text-gray-400">Powerful features to automate your Instagram</p>
+                    </motion.div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[
                             {
-                                icon: Brain,
-                                title: 'AI-Powered Conversations',
-                                desc: 'Smart AI understands context and responds naturally to every message',
-                                color: 'from-purple-500 to-pink-500'
+                                icon: Bot,
+                                title: 'AI Auto-Replies',
+                                description: 'Gemini AI generates contextual, natural replies to your Instagram DMs automatically',
+                                color: 'from-purple-500 to-pink-500',
                             },
                             {
                                 icon: Zap,
-                                title: 'Instant Responses',
-                                desc: 'Reply in under 2 seconds, 24/7. Never miss a lead again',
-                                color: 'from-yellow-500 to-orange-500'
+                                title: 'Smart Triggers',
+                                description: 'Set up rule-based automation with keyword matching, first messages, and more',
+                                color: 'from-blue-500 to-cyan-500',
                             },
                             {
-                                icon: TrendingUp,
-                                title: 'More Conversions',
-                                desc: 'Qualify leads automatically and convert up to 3x more customers',
-                                color: 'from-green-500 to-emerald-500'
-                            },
-                            {
-                                icon: Shield,
-                                title: 'Secure & Compliant',
-                                desc: 'Official Meta API integration. Your data is always safe',
-                                color: 'from-blue-500 to-cyan-500'
+                                icon: MessageSquare,
+                                title: 'Conversation Management',
+                                description: 'View all your Instagram conversations in one beautiful, organized interface',
+                                color: 'from-green-500 to-emerald-500',
                             },
                             {
                                 icon: BarChart3,
                                 title: 'Advanced Analytics',
-                                desc: 'Track every conversation, measure ROI, and optimize performance',
-                                color: 'from-indigo-500 to-purple-500'
+                                description: 'Track performance with detailed charts showing success rates and engagement',
+                                color: 'from-orange-500 to-red-500',
                             },
                             {
-                                icon: Globe,
-                                title: 'Multi-Language Support',
-                                desc: 'AI responds in your customers\' language automatically',
-                                color: 'from-pink-500 to-red-500'
+                                icon: TrendingUp,
+                                title: 'Performance Insights',
+                                description: 'Understand peak hours, automation performance, and optimize your strategy',
+                                color: 'from-pink-500 to-rose-500',
                             },
-                        ].map((feature, i) => (
-                            <div
-                                key={i}
-                                className="glass-card p-8 hover:scale-105 hover:shadow-2xl transition-all duration-300 group"
+                            {
+                                icon: Shield,
+                                title: 'Secure & Reliable',
+                                description: 'Enterprise-grade security with encrypted data and reliable message delivery',
+                                color: 'from-indigo-500 to-purple-500',
+                            },
+                        ].map((feature, index) => (
+                            <motion.div
+                                key={feature.title}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1 }}
+                                className="glass-card p-8 hover:border-primary-500/30 transition-all"
                             >
-                                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} bg-opacity-20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                                    <feature.icon size={32} className="text-white" />
+                                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6`}>
+                                    <feature.icon className="text-white" size={28} />
                                 </div>
-                                <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
-                                <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
-                            </div>
+                                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                                <p className="text-gray-400">{feature.description}</p>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Pricing Section */}
-            <section className="py-20 lg:py-32 relative">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-5xl font-black mb-6">
-                            Simple, Transparent <span className="instagram-gradient bg-clip-text text-transparent">Pricing</span>
-                        </h2>
-                        <p className="text-xl text-gray-400">
-                            Start free, upgrade as you grow. No hidden fees.
-                        </p>
-                    </div>
+            {/* How It Works */}
+            <section className="py-20 bg-black/20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-center mb-16"
+                    >
+                        <h2 className="text-4xl font-bold mb-4">How It Works</h2>
+                        <p className="text-xl text-gray-400">Get started in 3 simple steps</p>
+                    </motion.div>
 
-                    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        {/* Free Plan */}
-                        <div className="glass-card p-8 hover:scale-105 transition-all">
-                            <div className="text-sm font-bold text-gray-400 mb-2">STARTER</div>
-                            <div className="text-5xl font-black mb-2">$0</div>
-                            <div className="text-gray-400 mb-6">Forever free</div>
-
-                            <Link href="/auth/signin" className="w-full glass-card hover:bg-white/10 px-6 py-3 rounded-xl font-bold text-center block mb-6">
-                                Get Started
-                            </Link>
-
-                            <ul className="space-y-3">
-                                {['100 messages/day', 'Basic automations', 'Email support', 'Analytics dashboard'].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-gray-300">
-                                        <CheckCircle size={20} className="text-green-400 flex-shrink-0" />
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Pro Plan */}
-                        <div className="glass-card p-8 border-2 border-primary-500 hover:scale-105 transition-all relative overflow-hidden">
-                            <div className="absolute top-4 right-4 px-3 py-1 bg-primary-500 rounded-full text-xs font-bold">
-                                POPULAR
-                            </div>
-
-                            <div className="text-sm font-bold instagram-gradient bg-clip-text text-transparent mb-2">PRO</div>
-                            <div className="text-5xl font-black mb-2">$29</div>
-                            <div className="text-gray-400 mb-6">per month</div>
-
-                            <Link href="/auth/signin" className="w-full btn-primary px-6 py-3 rounded-xl font-bold text-center block mb-6">
-                                Start Free Trial
-                            </Link>
-
-                            <ul className="space-y-3">
-                                {['500 messages/day', 'Advanced AI', 'Priority support', 'Custom automations', 'Advanced analytics'].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-gray-300">
-                                        <CheckCircle size={20} className="text-primary-400 flex-shrink-0" />
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Business Plan */}
-                        <div className="glass-card p-8 hover:scale-105 transition-all">
-                            <div className="text-sm font-bold text-gray-400 mb-2">BUSINESS</div>
-                            <div className="text-5xl font-black mb-2">$99</div>
-                            <div className="text-gray-400 mb-6">per month</div>
-
-                            <Link href="/auth/signin" className="w-full glass-card hover:bg-white/10 px-6 py-3 rounded-xl font-bold text-center block mb-6">
-                                Get Started
-                            </Link>
-
-                            <ul className="space-y-3">
-                                {['Unlimited messages', 'White-label option', 'Dedicated support', 'API access', 'Custom integrations'].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-gray-300">
-                                        <CheckCircle size={20} className="text-purple-400 flex-shrink-0" />
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                step: '1',
+                                title: 'Connect Instagram',
+                                description: 'Sign in with Google and connect your Instagram Business account in seconds',
+                            },
+                            {
+                                step: '2',
+                                title: 'Create Automations',
+                                description: 'Set up AI-powered automation rules with custom triggers and business context',
+                            },
+                            {
+                                step: '3',
+                                title: 'Auto-Engage',
+                                description: 'Sit back and let AI handle your DMs 24/7 while you track performance',
+                            },
+                        ].map((item, index) => (
+                            <motion.div
+                                key={item.step}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.2 }}
+                                className="text-center"
+                            >
+                                <div className="w-16 h-16 rounded-full bg-primary-600 flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                                    {item.step}
+                                </div>
+                                <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
+                                <p className="text-gray-400">{item.description}</p>
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 relative">
-                <div className="max-w-4xl mx-auto px-6 text-center">
-                    <div className="glass-card p-12 lg:p-16 border border-primary-500/30 hover:border-primary-500/50 transition-all">
-                        <h2 className="text-5xl font-black mb-6">
-                            Ready to <span className="instagram-gradient bg-clip-text text-transparent">Automate</span>?
-                        </h2>
-                        <p className="text-xl text-gray-300 mb-10">
-                            Join thousands of businesses using AI to convert more Instagram DMs into customers
+            <section className="py-20">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="glass-card p-12 text-center"
+                    >
+                        <h2 className="text-4xl font-bold mb-4">Ready to Automate?</h2>
+                        <p className="text-xl text-gray-300 mb-8">
+                            Join thousands using AI to scale their Instagram engagement
                         </p>
-                        <Link
-                            href="/auth/signin"
-                            className="btn-primary px-12 py-6 text-xl font-bold inline-flex items-center gap-3"
+                        <button
+                            onClick={() => signIn('google', { callbackUrl: '/' })}
+                            className="btn-primary px-8 py-4 text-lg flex items-center justify-center gap-3 mx-auto"
                         >
+                            <Sparkles size={24} />
                             Start Free Today
-                            <ArrowRight size={24} />
-                        </Link>
-                    </div>
+                        </button>
+                        <p className="text-sm text-gray-500 mt-6">No credit card required • Free trial included</p>
+                    </motion.div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="border-t border-white/10 py-12">
-                <div className="max-w-7xl mx-auto px-6 text-center">
-                    <div className="flex items-center justify-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl instagram-gradient flex items-center justify-center">
-                            <Instagram size={24} className="text-white" />
-                        </div>
-                        <span className="text-xl font-black">InstaAuto</span>
-                    </div>
-                    <p className="text-gray-500 text-sm">
-                        © 2024 InstaAuto. All rights reserved.
-                    </p>
+            <footer className="border-t border-white/10 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400 text-sm">
+                    <p>© 2024 InstaAuto. Powered by Google Gemini AI.</p>
                 </div>
             </footer>
         </div>
-    )
+    );
 }

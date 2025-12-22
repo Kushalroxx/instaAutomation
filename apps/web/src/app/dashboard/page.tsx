@@ -1,0 +1,311 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import {
+    LayoutDashboard,
+    Zap,
+    MessageSquare,
+    BarChart3,
+    Settings,
+    Instagram,
+    TrendingUp,
+    Users,
+    Clock,
+    CheckCircle2,
+    XCircle,
+    Activity,
+    Sparkles,
+    Menu,
+    X
+} from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { UserMenu } from '@/components/user-menu'
+import { AutomationsManager } from '@/components/automations-manager'
+import { AnalyticsDashboard } from '@/components/analytics-dashboard'
+import { SettingsPanel } from '@/components/settings-panel'
+import { ConversationsManager } from '@/components/conversations-manager'
+
+export default function DashboardPage() {
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [activeTab, setActiveTab] = useState('overview')
+    const [isDesktop, setIsDesktop] = useState(false)
+
+    useEffect(() => {
+        const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024)
+        checkDesktop()
+        window.addEventListener('resize', checkDesktop)
+        return () => window.removeEventListener('resize', checkDesktop)
+    }, [])
+
+    return (
+        <div className="min-h-screen gradient-bg">
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden fixed top-4 left-4 z-50 p-3 glass-card"
+            >
+                {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            {/* Sidebar */}
+            <AnimatePresence>
+                {(sidebarOpen || isDesktop) && (
+                    <motion.aside
+                        initial={{ x: -300 }}
+                        animate={{ x: 0 }}
+                        exit={{ x: -300 }}
+                        className="fixed left-0 top-0 h-screen w-64 glass-card border-r border-white/10 p-6 z-40 lg:translate-x-0"
+                    >
+                        {/* Logo */}
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-10 h-10 rounded-xl instagram-gradient flex items-center justify-center">
+                                <Instagram className="text-white" size={24} />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold">InstaAuto</h1>
+                                <p className="text-xs text-gray-400">AI Automation</p>
+                            </div>
+                        </div>
+
+                        {/* Navigation */}
+                        <nav className="space-y-2">
+                            {[
+                                { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
+                                { id: 'automations', icon: Zap, label: 'Automations' },
+                                { id: 'conversations', icon: MessageSquare, label: 'Conversations' },
+                                { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+                                { id: 'settings', icon: Settings, label: 'Settings' },
+                            ].map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        setActiveTab(item.id)
+                                        setSidebarOpen(false)
+                                    }}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === item.id
+                                        ? 'bg-primary-600 text-white shadow-glow'
+                                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                        }`}
+                                >
+                                    <item.icon size={20} />
+                                    <span className="font-medium">{item.label}</span>
+                                </button>
+                            ))}
+                        </nav>
+
+                        {/* User Profile */}
+                        <div className="absolute bottom-6 left-6 right-6">
+                            <UserMenu />
+                        </div>
+                    </motion.aside>
+                )}
+            </AnimatePresence>
+
+            {/* Main Content */}
+            <main className="lg:ml-64 p-6 lg:p-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <h2 className="text-3xl font-bold mb-2">
+                        {activeTab === 'overview' && 'Dashboard Overview'}
+                        {activeTab === 'automations' && 'Automation Rules'}
+                        {activeTab === 'conversations' && 'Conversations'}
+                        {activeTab === 'analytics' && 'Analytics & Insights'}
+                        {activeTab === 'settings' && 'Settings'}
+                    </h2>
+                    <p className="text-gray-400">
+                        {activeTab === 'overview' && 'Monitor your Instagram automation performance'}
+                        {activeTab === 'automations' && 'Manage your AI-powered automation rules'}
+                        {activeTab === 'conversations' && 'View and manage all conversations'}
+                        {activeTab === 'analytics' && 'Deep dive into your automation metrics'}
+                        {activeTab === 'settings' && 'Configure your account and preferences'}
+                    </p>
+                </div>
+
+                {/* Content based on active tab */}
+                {activeTab === 'overview' && <OverviewContent />}
+                {activeTab === 'automations' && <AutomationsManager />}
+                {activeTab === 'conversations' && <ConversationsManager />}
+                {activeTab === 'analytics' && <AnalyticsDashboard />}
+                {activeTab === 'settings' && <SettingsPanel />}
+            </main>
+        </div>
+    )
+}
+
+// Overview Content Component
+function OverviewContent() {
+    const [stats, setStats] = useState([
+        {
+            label: 'Messages Processed',
+            value: '0',
+            change: '+0%',
+            icon: MessageSquare,
+            color: 'from-blue-500 to-cyan-500'
+        },
+        {
+            label: 'Active Automations',
+            value: '0',
+            change: '+0',
+            icon: Zap,
+            color: 'from-purple-500 to-pink-500'
+        },
+        {
+            label: 'Response Rate',
+            value: '0%',
+            change: '+0%',
+            icon: TrendingUp,
+            color: 'from-green-500 to-emerald-500'
+        },
+        {
+            label: 'Active Users',
+            value: '0',
+            change: '+0',
+            icon: Users,
+            color: 'from-orange-500 to-red-500'
+        },
+    ])
+    const [recentActivity, setRecentActivity] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                // Fetch stats
+                const statsRes = await fetch('/api/stats')
+                const statsData = await statsRes.json()
+
+                if (statsData.stats) {
+                    setStats([
+                        {
+                            label: 'Messages Processed',
+                            value: statsData.stats.messagesProcessed.toString(),
+                            change: '+0%',
+                            icon: MessageSquare,
+                            color: 'from-blue-500 to-cyan-500'
+                        },
+                        {
+                            label: 'Active Automations',
+                            value: statsData.stats.activeAutomations.toString(),
+                            change: '+0',
+                            icon: Zap,
+                            color: 'from-purple-500 to-pink-500'
+                        },
+                        {
+                            label: 'Response Rate',
+                            value: statsData.stats.responseRate,
+                            change: '+0%',
+                            icon: TrendingUp,
+                            color: 'from-green-500 to-emerald-500'
+                        },
+                        {
+                            label: 'Active Users',
+                            value: statsData.stats.activeUsers.toString(),
+                            change: '+0',
+                            icon: Users,
+                            color: 'from-orange-500 to-red-500'
+                        },
+                    ])
+                }
+
+                // Fetch activity
+                const activityRes = await fetch('/api/activity')
+                const activityData = await activityRes.json()
+                if (activityData.activity) {
+                    setRecentActivity(activityData.activity)
+                }
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
+    return (
+        <div className="space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {stats.map((stat, index) => (
+                    <motion.div
+                        key={stat.label}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="glass-card stat-card p-6"
+                    >
+                        <div className="flex items-start justify-between mb-4">
+                            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                                <stat.icon className="text-white" size={24} />
+                            </div>
+                            <span className="badge badge-success">{stat.change}</span>
+                        </div>
+                        <h3 className="text-3xl font-bold mb-1">{stat.value}</h3>
+                        <p className="text-sm text-gray-400">{stat.label}</p>
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* Recent Activity */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="glass-card p-6"
+                >
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <Activity size={20} className="text-primary-500" />
+                        Recent Activity
+                    </h3>
+                    <div className="space-y-4">
+                        {[
+                            { action: 'New message received', user: '@sarah_designs', time: '2 min ago', status: 'success' },
+                            { action: 'AI response sent', user: '@mike_photos', time: '5 min ago', status: 'success' },
+                            { action: 'Automation triggered', user: '@emma_art', time: '12 min ago', status: 'success' },
+                            { action: 'Failed to send', user: '@john_dev', time: '15 min ago', status: 'error' },
+                        ].map((activity, i) => (
+                            <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                                {activity.status === 'success' ? (
+                                    <CheckCircle2 size={20} className="text-green-500" />
+                                ) : (
+                                    <XCircle size={20} className="text-red-500" />
+                                )}
+                                <div className="flex-1">
+                                    <p className="text-sm font-medium">{activity.action}</p>
+                                    <p className="text-xs text-gray-400">{activity.user}</p>
+                                </div>
+                                <span className="text-xs text-gray-500">{activity.time}</span>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Quick Actions */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="glass-card p-6"
+                >
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                        <Sparkles size={20} className="text-primary-500" />
+                        Quick Actions
+                    </h3>
+                    <div className="space-y-3">
+                        <button className="w-full btn-primary flex items-center justify-center gap-2">
+                            <Zap size={18} />
+                            Create New Automation
+                        </button>
+                        <button className="w-full glass-card p-3 hover:bg-white/10 transition-colors rounded-xl flex items-center justify-center gap-2">
+                            <Instagram size={18} />
+                            Connect Instagram Account
+                        </button>
+                        <button className="w-full glass-card p-3 hover:bg-white/10 transition-colors rounded-xl flex items-center justify-center gap-2">
+                            <BarChart3 size={18} />
+                            View Full Analytics
+                        </button>
+                    </div>
+                </motion.div>
+            </div>
+        </div>
+    )
+}
